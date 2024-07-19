@@ -57,6 +57,7 @@ router.post('/login', async (req: Request, res: Response) => {
     return res.status(400).json({ message: 'Invalid password' });
   }
 
+  // Create a token and send it to the user
   const tokenPayLoad = {
     id: isUserPresent._id,
     firstName: isUserPresent.firstName,
@@ -73,5 +74,27 @@ router.post('/login', async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" + err });
   }
 });
+
+router.get('/profile', (req: Request, res: Response) => {
+  const { token } = req.cookies; // Get token from the cookies
+
+  // If token is not present in the cookies
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // Verify the token and send the user data to the client
+  jwt.verify(token, secret, {}, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    res.json(decoded);
+  })
+})
+
+router.post('/logout', (req: Request, res: Response) => {
+  res.clearCookie("token").json({ message: "Logged out" }); // Clear the token from the cookies
+})
 
 export default router;
