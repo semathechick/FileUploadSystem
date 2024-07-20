@@ -18,9 +18,30 @@ function Register() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log(form)
+
+    try {
+      let response = await fetch("http://localhost:3000/user/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+
+        if (errorData.message === 'User already exists') {
+          alert('User already exists')
+        } else {
+          alert('Internal server error')
+        }
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   return (
