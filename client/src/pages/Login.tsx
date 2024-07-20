@@ -1,30 +1,25 @@
-import React, { useState } from "react"
-import { Link, Navigate } from "react-router-dom"
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
-function Register() {
+function Login() {
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
-    phoneNumber: "",
     password: "",
   })
-
-  const [redirect, setRedirect] = useState<Boolean>(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setForm({
-      ...form,
-      [name]: value,
+      ...form, // Spread operator to copy the previous state
+      [name]: value, // Updating the value of the input field
     })
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault() // Preventing the default behaviour of the form
 
     try {
-      let response = await fetch("http://localhost:3000/user/register", {
+      let response = await fetch("http://localhost:3000/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,24 +27,22 @@ function Register() {
         body: JSON.stringify(form),
       })
 
-      if (!response.ok) {
+      if (!response.ok){
         const errorData = await response.json()
 
-        if (errorData.message === 'User already exists') {
-          alert('User already exists')
+        if (errorData.message === 'User not found') {
+          alert('User not found')
+        } else if (errorData.message === 'Invalid password') {
+          alert('Invalid password')
         } else {
           alert('Internal server error')
         }
       } else {
-        setRedirect(true)
+        alert('Logged in successfully')
       }
     } catch (err) {
       console.error(err)
     }
-  }
-
-  if (redirect) {
-    return <Navigate to={'/login'} />
   }
 
   return (
@@ -60,42 +53,16 @@ function Register() {
         onSubmit={handleSubmit}
       >
         <div className="flex flex-col-reverse gap-3 justify-center items-center mt-6">
-          <h1 className="text-2xl font-semibold">Welcome! User</h1>
+          <h1 className="text-2xl font-semibold">Welcome! Admin</h1>
         </div>
 
         <div className="flex flex-col my-6 gap-3">
-          <input type="text"
-            placeholder="First name"
-            className="border-b-2 border-gray-300 py-2 px-1 outline-none"
-            name="firstName"
-            value={form.firstName}
-            onChange={handleChange}
-          />
-
-          <input
-            type="text"
-            placeholder="Last name"
-            className="border-b-2 border-gray-300 py-2 px-1 outline-none"
-            name="lastName"
-            value={form.lastName}
-            onChange={handleChange}
-          />
-
           <input
             type="email"
             placeholder="Email"
             className="border-b-2 border-gray-300 py-2 px-1 outline-none"
             name="email"
             value={form.email}
-            onChange={handleChange}
-          />
-
-          <input
-            type="number"
-            placeholder="Phone number"
-            className="border-b-2 border-gray-300 py-2 px-1 outline-none"
-            name="phoneNumber"
-            value={form.phoneNumber}
             onChange={handleChange}
           />
 
@@ -112,7 +79,7 @@ function Register() {
             className="bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 ease-in-out mt-5"
             type="submit"
           >
-            Register
+            Login
           </button>
         </div>
 
@@ -121,14 +88,14 @@ function Register() {
             <p
               className="text-sm text-gray-600 font-light mt-2 text-center"
             >
-              Already have an account?
+              Don't have an account?
             </p>
 
             <Link
-              to={"/login"}
+              to={"/register"}
               className="text-blue-500 text-sm font-light mt-2 text-center hover:underline transition duration-300 ease-in-out"
             >
-              Login
+              Register
             </Link>
           </div>
         </div>
@@ -137,4 +104,4 @@ function Register() {
   )
 }
 
-export default Register
+export default Login
