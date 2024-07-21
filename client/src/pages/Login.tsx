@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 
 function Login() {
   const [form, setForm] = useState({
     email: "",
     password: "",
   })
+
+  const [redirect, setRedirect] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -25,6 +27,7 @@ function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
+        credentials: "include", // To allow the server to set the cookies in the client
       })
 
       if (!response.ok){
@@ -38,11 +41,15 @@ function Login() {
           alert('Internal server error')
         }
       } else {
-        alert('Logged in successfully')
+        setRedirect(true)
       }
     } catch (err) {
       console.error(err)
     }
+  }
+
+  if (redirect) {
+    return <Navigate to="/home" />
   }
 
   return (
@@ -53,7 +60,7 @@ function Login() {
         onSubmit={handleSubmit}
       >
         <div className="flex flex-col-reverse gap-3 justify-center items-center mt-6">
-          <h1 className="text-2xl font-semibold">Welcome! Admin</h1>
+          <h1 className="text-2xl font-semibold">Welcome! User</h1>
         </div>
 
         <div className="flex flex-col my-6 gap-3">

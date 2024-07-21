@@ -68,30 +68,29 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 
   try {
-    const token = jwt.sign(tokenPayLoad, secret, {})
+    const token = jwt.sign(tokenPayLoad, secret, { expiresIn: '1h' }); // Set expiry time for token
     res.cookie("token", token, { httpOnly: true, secure: true }).json(tokenPayLoad)
   } catch (err) {
     res.status(500).json({ message: "Internal server error" + err });
   }
 });
 
-router.get('/profile', (req: Request, res: Response) => {
-  const { token } = req.cookies; // Get token from the cookies
+router.get("/profile", (req: Request, res: Response) => {
+  const { token } = req.cookies;
 
   // If token is not present in the cookies
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: "Token error" });
   }
 
-  // Verify the token and send the user data to the client
-  jwt.verify(token, secret, {}, (err, decoded) => {
+  // Verify the token and send the user information
+  jwt.verify(token, secret, {}, (err, info) => {
     if (err) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
-
-    res.json(decoded);
-  })
-})
+    res.json(info);
+  });
+});
 
 router.post('/logout', (req: Request, res: Response) => {
   res.clearCookie("token").json({ message: "Logged out" }); // Clear the token from the cookies
